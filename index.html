@@ -227,6 +227,34 @@
 
     /* Tooltip CSS moved above */
 
+    /* ── MOBILE RESPONSIVE ───────────────────────────── */
+    #menu-btn{
+      display:none;background:none;border:1px solid #b0c8e0;border-radius:4px;
+      padding:5px 9px;font-size:17px;cursor:pointer;color:#3a6090;flex-shrink:0;
+      line-height:1;font-family:inherit;
+    }
+    #menu-btn:hover{background:#d0e4f8}
+    #sidebar-overlay{
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:499;
+    }
+    @media(max-width:768px){
+      body{display:block;height:100vh;overflow:hidden}
+      #sidebar{
+        position:fixed;top:0;left:0;bottom:0;
+        width:82vw !important;max-width:310px;
+        transform:translateX(-100%);transition:transform .28s ease;
+        z-index:500;
+      }
+      #sidebar.mobile-open{transform:translateX(0)}
+      #sidebar-overlay.mobile-open{display:block}
+      #resize-handle{display:none}
+      #main-wrapper{width:100%;height:100vh;display:flex;flex-direction:column}
+      #law-tabs{position:fixed;bottom:0;left:0;right:0;z-index:200}
+      .law-panel{padding-bottom:64px}
+      #menu-btn{display:inline-block}
+      #font-ctrl span{display:none}
+    }
+
     /* History */
     #history-panel{
       padding:8px 16px;background:#f8fafe;
@@ -2207,10 +2235,12 @@
   </div>
   <div id="resize-handle"></div>
 </nav>
+<div id="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
 
 <!-- MAIN -->
 <div id="main-wrapper">
   <div id="top-bar">
+    <button id="menu-btn" onclick="toggleMobileSidebar()" aria-label="목차 열기">☰</button>
     <div id="law-badge">특허법</div>
     <div id="breadcrumb">
       <span class="bc-chapter" id="bc-chapter"></span>
@@ -7310,6 +7340,12 @@ function navigateTo(artId, pushHistory = true) {
   currentId = artId;
   updateSidebarActive(artId, law);
   updateBreadcrumb(artId, law);
+
+  // 모바일에서 조문 선택 후 사이드바 닫기
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebar-overlay').classList.remove('mobile-open');
+  }
 }
 
 function goBack() {
@@ -7525,6 +7561,12 @@ function updateHistoryPanel() {
     const k  = el?.querySelector('.art-header')?.textContent || id;
     return `<span class="history-item" onclick="navigateTo('${id}')">${k.replace(/\(.*?\)/, '')}</span>`;
   }).join('');
+}
+
+// ── Mobile sidebar toggle ─────────────────────────
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebar-overlay').classList.toggle('mobile-open');
 }
 
 // ── Sidebar resize ────────────────────────────────
